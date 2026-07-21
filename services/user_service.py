@@ -2,6 +2,12 @@ from sqlalchemy.orm import Session
 from schemas.user import UserCreate
 from  models.user import User
 from auth.hashing import Hash
+from auth.jwt_handler import create_access_token
+from sqlalchemy.orm import Session
+from models.blog import Blog
+from models.user import User
+from schemas.blog import BlogCreate
+from fastapi.security import OAuth2PasswordRequestForm
 
 class UserService:
 
@@ -19,3 +25,15 @@ class UserService:
         db.commit()
         db.refresh(new_user)
         return new_user
+
+    @staticmethod
+    def login(login_data : OAuth2PasswordRequestForm, db : Session):
+        db_user = db.query(User).filter(User.email == login_data.username).first()
+        if not db_user:
+            raise ValueError("Invalid password or email")
+        is_verified = Hash.verify_password(login_data.password, db_user.hashed_password)
+        if not is_verified:
+            raise ValueError("Invalid password or email")
+        token = create_access_token({"sub": db_user.email})
+        return token
+
