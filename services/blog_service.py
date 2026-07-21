@@ -17,3 +17,15 @@ class BlogService:
         db.commit()
         db.refresh(new_blog)
         return new_blog
+
+    @staticmethod
+    def get_all_blogs(db: Session):
+        blogs = db.query(Blog).all()
+        return blogs
+
+    @staticmethod
+    def get_blog_by_id(blog_id: int, db: Session):
+        blog = (db.query(Blog).filter(Blog.id == blog_id).first())
+        if blog is None:
+            raise ValueError("Blog not found")
+        return blog
