@@ -3,6 +3,7 @@
 A production-ready RESTful Blog API built using **FastAPI** that provides secure user authentication, blog management, and authorization using **JWT (JSON Web Tokens)**. The project follows a clean layered architecture with separate routers, services, models, and schemas for maintainability and scalability.
 
 *Live Site* - https://bloghup-api.onrender.com/
+
 *Live Swagger for Testing* - https://bloghup-api.onrender.com/docs
 
 ---
