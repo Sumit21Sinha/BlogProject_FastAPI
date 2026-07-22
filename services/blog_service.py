@@ -6,7 +6,7 @@ from auth.jwt_handler import create_access_token
 from sqlalchemy.orm import Session
 from models.blog import Blog
 from models.user import User
-from schemas.blog import BlogCreate
+from schemas.blog import BlogCreate, BlogUpdate
 
 class BlogService:
 
@@ -19,7 +19,8 @@ class BlogService:
         return new_blog
 
     @staticmethod
-    def get_all_blogs(db: Session):
+    def get_all_blogs(page: int, limit: int, db: Session):
+        offset = (page - 1) * limit
         blogs = db.query(Blog).all()
         return blogs
 
@@ -29,3 +30,27 @@ class BlogService:
         if blog is None:
             raise ValueError("Blog not found")
         return blog
+
+    @staticmethod
+    def update_blog(blog_id : int, blog_data : BlogUpdate,db : Session, current_user: User):
+        blog = db.query(Blog).filter(Blog.id == blog_id).first()
+        if blog is None:
+            raise ValueError("Blog not found")
+        if blog.owner_id != current_user.id:
+            raise PermissionError("You are not allowed to edit this blog")
+        blog.title = blog_data.title
+        blog.content = blog_data.content
+        db.commit()
+        db.refresh(blog)
+        return blog
+
+    @staticmethod
+    def delete_blog(blog_id: int, db: Session, current_user: User):
+        blog = (db.query(Blog).filter(Blog.id == blog_id).first())
+        if blog is None:
+            raise ValueError("Blog not found")
+        if blog.owner_id != current_user.id:
+            raise PermissionError("You are not authorized to delete this blog.")
+        db.delete(blog)
+        db.commit()
+        return {"message": "Blog deleted successfully"}
