@@ -21,7 +21,7 @@ class BlogService:
     @staticmethod
     def get_all_blogs(page: int, limit: int, db: Session):
         offset = (page - 1) * limit
-        blogs = db.query(Blog).all()
+        blogs = db.query(Blog).offset(offset).limit(limit).all()
         return blogs
 
     @staticmethod
